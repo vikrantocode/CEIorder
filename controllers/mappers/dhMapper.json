@@ -1,0 +1,18 @@
+{
+  "qtyAvailable": "packQuantity",
+  "rebateFlag": "isRebate",
+  "rebateEndDate": "rebateEndDate",
+  "itemNumber": "itemNumber",
+  "manfItemNumber": "manufacturerPartNumber",
+  "upc": "UPCRetail",
+  "subCategoryCode": "vendorCategory",
+  "vendorName": "subVendorName",
+  "unitCost": "listPrice",
+  "rebateAmount": "rebateAmount",
+  "handlingCharge": "handlingCharge",
+  "freight": "freightPrice",
+  "weight": "itemWeight",
+  "shortDescription": "description25Char",
+  "longDescription": "description125Character",
+  "category": "productCategory"
+}

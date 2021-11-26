@@ -1,0 +1,15 @@
+{
+	"BRAND": "brandShortName",
+	"SKU": "itemNumber",
+	"EAN/UPC": "UPCRetail",
+	"SIZE": "size",
+	"COLOR": "color",
+	"PRODUCT DESCRIPTION": "description25Char",
+	"OPTION CODE": "OPTION CODE",
+	"CERTIFICATION": "CERTIFICATION",
+	"MTO/MTS": "MTO/MTS",
+	"Case QTY": "itemPackageQty",
+	"Leadtime": "leadTimeToShip",
+	"2020 Level A (boxes)": "listPrice",
+	"2020 List Price": "costColumn1Price"
+}

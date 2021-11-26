@@ -1,0 +1,10 @@
+{
+    "Description":"description25Char",
+    "Color":"color",
+    "SKU":"itemNumber",
+    "Size":"size",
+    "Wholesale":"costColumn1Price",
+    "Retail/MAP":"MAPPPrice",
+    "Series":"category"
+}
+ 

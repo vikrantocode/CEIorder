@@ -1,0 +1,287 @@
+const _ = require('lodash-contrib')
+
+module.exports = (data, idAndName) => {
+    const result = []
+    const vendorDetails = idAndName.split(', ')
+    console.log(`${vendorDetails[0]} : ${vendorDetails[1]}`)
+    data.map(item => {
+        result.push(_.renameKeys(item, {
+            'Item Number' : 'itemNumber',
+            'Item Prefix' : 'itemPrefix',
+            'Description 25 Character' : 'description25Char',
+            'Description 125 Character' : 'description125Character',
+            'Vendor Abbreviation' : 'vendorAbbreviation',
+            'Vendor Short Name' : 'vendorShortName',
+            'Brand Short Name' : 'brandShortName',
+            'Brand Long Name' : 'brandLongName',
+            'Manufacturer Short Name' : 'manufacturerShortName',
+            'Manufacturer Long Name' : 'manufacturerLongName',
+            'Vendor Pricer Print Name' : 'vendorPricerPrintName',
+            'Unit of Measure' : 'unitOfMeasure',
+            'List Price' : 'listPrice',
+            'List Price Effective Date' : 'listPriceEffectiveDate',
+            'Price Plan' : 'pricePlan',
+            'Price Plan Name' : 'pricePlanName',
+            'Price Plan Type' : 'pricePlanType',
+            'Price Start Date' : 'priceStartDate',
+            'Price End Date' : 'priceEndDate',
+            'Cost Column 1 Quantity' : 'costColumn1Quantity',
+            'Cost Column 1 Price' : 'costColumn1Price',
+            'Cost Column 2 Quantity' : 'costColumn2Quantity',
+            'Cost Column 2 Price' : 'costColumn2Price',
+            'Cost Column Type' : 'costColumnType',
+            'Cost Facility Code' : 'costFacilityCode',
+            'Cost Start Column' : 'costStartColumn',
+            'Cost Stop Column' : 'costStopColumn',
+            'Cost Type Code' : 'costTypeCode',
+            'Action Indicator' : 'actionIndicator',
+            'Active Indicator' : 'activeIndicator',
+            'Air Shippable Indicator' : 'airShippableIndicator',
+            'Assembly Indicator' : 'assemblyIndicator',
+            'Blank Space One Character' : 'blankSpaceOneCharacter',
+            'Business Unit' : 'businessUnit',
+            'Box Pack Quantity' : 'boxPackQuantity',
+            'Box Pack Unit' : 'boxPackUnit',
+            'Box Depth' : 'boxDepth',
+            'Box Height' : 'boxHeight',
+            'Box Width' : 'boxWidth',
+            'Box Expanded Weight' : 'boxExpandedWeight',
+            'Carton Pack Quantity' : 'cartonPackQuantity',
+            'Carton Pack Unit' : 'cartonPackUnit',
+            'Carton Depth' : 'cartonDepth',
+            'Carton Height' : 'cartonHeight',
+            'Carton Width' : 'cartonWidth',
+            'Carton Expanded Weight' : 'cartonExpandedWeight',
+            'Carton Rounded Weight' : 'cartonRoundedWeight',
+            'Catalog Code 1' : 'catalogCode1',
+            'Catalog Name 1' : 'catalogName1',
+            'Catalog Page 1 Current Yr' : 'catalogPage1CurrentYear',
+            'Catalog Page 1 Next Year' : 'catalogPage1NextYear',
+            'Catalog Page 1 Prior Year' : 'catalogPage1PriorYear',
+            'Catalog Unit 1' : 'catalogUnit1',
+            'Catalog Code 2' : 'catalogCode2',
+            'Catalog Name 2' : 'catalogName2',
+            'Catalog Page 2 Current Yr' : 'catalogPage2CurrentYear',
+            'Catalog Page 2 Next Year' : 'catalogPage2NextYear',
+            'Catalog Page 2 Prior Year' : 'catalogPage2PriorYear',
+            'Catalog Unit 2' : 'catalogUnit2',
+            'Catalog Code 3' : 'catalogCode3',
+            'Catalog Name 3' : 'catalogName3',
+            'Catalog Page 3 Current Yr' : 'catalogPage3CurrentYear',
+            'Catalog Page 3 Next Year' : 'catalogPage3NextYear',
+            'Catalog Page 3 Prior Year' : 'catalogPage3PriorYear',
+            'Catalog Unit 3' : 'catalogUnit3',
+            'Consolidated Item Copy' : 'consolidatedItemCopy',
+            'Content Quality Class' : 'contentQualityClass',
+            'Country of Origin Code' : 'countryOriginCode',
+            'Country of Origin Name' : 'countryOriginName',
+            'Discontinued-To Be Disco' : 'discontinuedToBeDisco',
+            'Discontinued Date' : 'discontinuedDate',
+            'Discontinued Source' : 'discontinuedSource',
+            'Dual SKU Number' : 'dualSKUNumber',
+            'Dual SKU Sequence' : 'dualSKUSequence',
+            'Energy Star Rated Code' : 'energyStarRatedCode',
+            'EPA/CPG Code' : 'EPAOrCPGCode',
+            'Expiration Date Indicator' : 'expirationDateIndicator',
+            'Facility Total OnHand Qty' : 'facilityTotalOnHandQty',
+            'Green Indicator' : 'greenIndicator',
+            'Green Information' : 'greenInformation',
+            'Hazardous Material Code' : 'hazardousMaterialCode',
+            'HUB Supplier' : 'hubSupplier',
+            'Image Name Brand Logo' : 'imageNameBrandLogo',
+            'Image Name Item' : 'imageNameItem',
+            'Image Name Item Alt' : 'imageNameItemAlt',
+            'Image Name Line Drawing' : 'imageNameLineDrawing',
+            'Image Name MSDS PDF' : 'imageNameMSDSPDF',
+            'Image Name Product Lit' : 'imageNameProductLit',
+            'Image Name SKU Group' : 'imageNameSKUGroup',
+            'Image Name SKU Group Alt' : 'imageNameSKUGroupAlt',
+            'Image Name Swatches' : 'imageNameSwatches',
+            'Item Number Revised' : 'itemNumberRevised',
+            'Item Number Substitute' : 'itemNumberSubstitute',
+            'Item Reference Code' : 'itemReferenceCode',
+            'Item Qty PreAuth Code' : 'itemQtyPreAuthCode',
+            'Item Cubic Feet' : 'itemCubicFeet',
+            'Item Cubic Inches' : 'itemCubicInches',
+            'Item Depth' : 'itemDepth',
+            'Item Height' : 'itemHeight',
+            'Item Width' : 'itemWidth',
+            'Item Weight' : 'itemWeight',
+            'Item Video URL' : 'itemVideoUrl',
+            'Keywords' : 'keywords',
+            'Last Invoiced Amount' : 'lastInvoicedAmount',
+            'Last Invoiced Date' : 'lastInvoicedDate',
+            'Last Invoiced Number' : 'lastInvoicedNumber',
+            'Last Invoiced Price Plan' : 'lastInvoicedPricePlan',
+            'Manufacturer Part Number' : 'manufacturerPartNumber',
+            'Manufacturer URL' : 'manufacturerUrl',
+            'MSDS Code' : 'MSDSCode',
+            'National Stock Number' : 'nationalStockNumber',
+            'Non-Returnable Code' : 'nonReturnabeCode',
+            'Pack Quantity' : 'packQuantity',
+            'Pack Unit' : 'packUnit',
+            'Package Includes' : 'packageIncludes',
+            'Pink Indicator' : 'pinkIndicator',
+            'Private Brand Indicator' : 'privateBrandIndicator',
+            'Product Class Code' : 'productClassCode',
+            'Product Class Description' : 'productClassDescription',
+            'Product Class Cat 1 Code' : 'productClassCat1Code',
+            'Product Class Cat 1 Desc' : 'productClassCat1Description',
+            'Product Class Cat 2 Code' : 'productClassCat2Code',
+            'Product Class Cat 2 Desc' : 'productClassCat2Description',
+            'Product Class Cat 3 Code' : 'productClassCat3Code',
+            'Product Class Cat 3 Desc' : 'productClassCat3Description',
+            'Product Class Cat 4 Code' : 'productClassCat4Code',
+            'Product Class Cat 4 Desc' : 'productClassCat4Description',
+            'Product Number' : 'productId',
+            'Prop 65 Indicator' : 'prop65Indicator',
+            'Prop 65 Label Indicator' : 'prop65LabelIndicator',
+            'Prop 65 Toxicity-Chemical' : 'prop65ToxicityChemical',
+            'Prop 65 Warning Message' : 'prop65WarningMessage',
+            'Recycled Indicator' : 'recycledIndicator',
+            'Recycled Ctnt %-Pre-Cons' : 'recycleCtntPrcntgPreCons',
+            'Recycled Ctnt %-Post-Cons' : 'recycleCtntPrcntgPostCons',
+            'Recycled Ctnt %-Total' : 'recycleCtntPrcntgTotal',
+            'Selling Copy Short' : 'sellingCopyShort',
+            'Selling Copy Medium' : 'sellingCopyMedium',
+            'Selling Copy Long' : 'sellingCopyLong',
+            'Selling Point #1' : 'sellingPoint1',
+            'Selling Point #2' : 'sellingPoint2',
+            'Selling Point #3' : 'sellingPoint3',
+            'Selling Point #4' : 'sellingPoint4',
+            'Selling Point #5' : 'sellingPoint5',
+            'Selling Point #6' : 'sellingPoint6',
+            'Selling Point #7' : 'sellingPoint7',
+            'Selling Point #8' : 'sellingPoint8',
+            'Selling Point #9' : 'sellingPoint9',
+            'Selling Point #10' : 'sellingPoint10',
+            'Selling Statement Summary' : 'sellingStatementSummary',
+            'Serial Numbr Required Ind' : 'serialNumbrRequiredInd',
+            'Shipping Class Code' : 'shippingClassCode',
+            'SKU Group ID' : 'SKUGroupId',
+            'SKU Group Name' : 'SKUGroupName',
+            'SKU Group Video URL' : 'SKUGroupVideoUrl',
+            'Special Feat Benefit Stmt' : 'specialFeatBenefitStmt',
+            'State Restriction Code' : 'stateRestrictionCode',
+            'Stock Status Code' : 'stockStatusCode',
+            'Stocking Indicator' : 'stockingIndicator',
+            'Stocking Indicator Descr' : 'stockingIndicatorDescr',
+            'TAA/GSA Code' : 'TAAOrGSACode',
+            'UL Code' : 'ULCode',
+            'Unit Conversion Factor' : 'unitConversionFactor',
+            'Unit Conversion Qty' : 'unitConversionQty',
+            'Unit of Measure Qty' : 'unitOfMeasureQty',
+            'Unit within UOM' : 'unitWithinUOM',
+            'UNSPSC' : 'UNSPSC',
+            'UPC Retail' : 'UPCRetail',
+            'UPC Item GTIN' : 'UPCItemGTIN',
+            'UPC Box GTIN' : 'UPCBoxGTIN',
+            'UPC Carton GTIN' : 'UPCCartonGTIN',
+            'UPS Indicator' : 'UPSIndicator',
+            'Usage Current YTD $' : 'usageCurrentYTD$',
+            'Usage Current YTD QTY' : 'usageCurrentYTDQTY',
+            'Usage Last 3 Months $' : 'usageLast3Months$',
+            'Usage Last 3 Months QTY' : 'usageLast3MonthsQTY',
+            'Usage Last 6 Months $' : 'usageLast6Months$',
+            'Usage Last 6 Months QTY' : 'usageLast6MonthsQTY',
+            'Usage Last 12 Months $' : 'usageLast12Months$',
+            'Usage Last 12 Months QTY' : 'usageLast12MonthsQTY',
+            'Usage Last Year $' : 'usageLastYear$',
+            'Usage Last Year QTY' : 'usageLastYearQTY',
+            'Usage Last YTD $' : 'usageLastYTD$',
+            'Usage Last YTD QTY' : 'usageLastYTDQTY',
+            'Value Pack' : 'valuePack',
+            'Warranty Comments' : 'warrantyComments',
+            'Warranty Indicator' : 'warrantyIndicator',
+            'Web Availability' : 'webAvailability',
+            'Azerty: Calc Cons Price1' : 'azertyCalcConsPrice1',
+            'Azerty: Calc Cons Price2' : 'azertyCalcConsPrice2',
+            'Azerty: Margin Formula' : 'azertyMarginFormula',
+            'Stock Status-ALBAN-ALB-16' : 'stockStatusALBANALB16',
+            'On Hand Qty-ALBAN-ALB-16' : 'onHandQtyALBANALB16',
+            'Stock Status-ATLAN-ATL-01' : 'stockStatusATLANATL01',
+            'On Hand Qty-ATLAN-ATL-01' : 'onHandQtyATLANATL01',
+            'Stock Status-ATLAN-AGA-40' : 'stockStatusATLANAGA40',
+            'On Hand Qty-ATLAN-AGA-40' : 'onHandQtyATLANAGA40',
+            "item_nbr" : "itemNumber",
+            "srp_cost" : "listPrice",
+            "short_description" : "description25Char",
+            "long_description" : "description125Character",
+            // "vendor_id" : "vendorId",
+            "vendor_name" : "vendorAbbreviation",
+            "upc" : "UPCRetail",
+            "weight" : "itemWeight",
+            "length" : "itemDepth",
+            "width" : "itemWidth",
+            "height" : "itemWeight",
+            "pack_weight" : "cartonExpandedWeight",
+            "pack_length" : "cartonDepth",
+            "pack_width" : "cartonWidth",
+            "pack_height" : "cartonHeight",
+            "country_code" : "countryOriginCode",
+            "to_be_discontinued" : "discontinuedToBeDisco",
+            "substitute_item_nbr" : "itemNumberSubstitute",
+            "retail_uom" : "unitWithinUOM",
+            "Prop65Flag" : "prop65Indicator",
+            "Prop65WarningText" : "prop65WarningMessage",
+            "OnlineRestriction" : "stateRestrictionCode",
+            "member_cost" : "costColumn1Price",
+            "ds_cost" : "costColumn2Price",
+            "retail_pack_qty": "boxPackQuantity",
+            "dpt_code" : "dptCode",
+            "class_code" : "classCode",
+            "subclass_code" : "subClassCode",
+            "member_pack_qty" : "memberPackQty",
+            "member_pack_type" : "memberPackType",
+            "member_break_pack" : "memberBreakPack",
+            "model" : "model",
+            "item_picture_id" : "itemPictureId",
+            "Edit_Divisor" : "editDivisor",
+            "Exclusive_Brand_Code" : "exclusiveBrandCode"
+        }))
+    })
+    result.map(item => {
+        item.basicProductDetailProductId = item.productId
+        item.masterSKU = vendorDetails[1].replace(/ /g,'').toUpperCase().substr(0,3) + item.itemNumber
+        item.vendorId = parseInt(vendorDetails[0])
+        if(vendorDetails[1].toLowerCase() === 'truevalue')
+            item.imageNameItem = `https://images.truevalue.com/getimage.asp?id=${item.itemNumber}`
+    })
+    const headers = Object.keys(result[0])
+    const dateHeaders = headers.filter(header => header.toLowerCase().endsWith('date'))
+    const booleanFields = headers.filter(header => header.toLowerCase().endsWith('indicator') || header.toLowerCase().endsWith('availability'))
+    result.map(item => {
+        if(!item.vendorShortName || item.vendorShortName === undefined)
+            item.vendorShortName = ''
+        if(!item.vendorPricerPrintName || item.vendorPricerPrintName === undefined)
+            item.vendorPricerPrintName = ''
+        console.log(item)
+        if(item.keywords){
+            const keywords = item.keywords.split(';')
+            item.keywords = keywords
+        }else {
+            item.keywords = []
+        }
+        if(!item.productCategory || !item.productCategory.length)
+        item.productCategory = []
+        if(!item.packageIncludes || !item.packageIncludes.length)
+        item.packageIncludes = []
+        else
+        item.packageIncludes = item.packageIncludes.split(/[,;]+/);
+        headers.map(header => {
+            if(item[header] === 'Y' || item[header] === 'X' || item[header] === 'G' || item[header] === 'A'|| item[header] === 'V' || item[header] === 'P'  || item[header] === 'C' || item[header] === 'H' || item[header] === 'B' || item[header] === 'S' || item[header] === 'R'|| item[header] === 'I'|| item[header] === 'L'|| item[header] === 'M')
+                item[header] = true
+            else if (item[header] === 'N')
+                item[header] = false                
+        })
+        dateHeaders.map(dateHeader => {
+            if(item[dateHeader] === '')
+                item[dateHeader] = null
+        })
+        booleanFields.map(dateHeader => {
+            if(item[dateHeader] === '' || item[dateHeader] === ' ')
+                item[dateHeader] = false
+        })
+    })
+    return result
+}

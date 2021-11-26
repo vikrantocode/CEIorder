@@ -1,0 +1,14 @@
+    {
+    "field1": "",
+    "Product Group": "Group",
+    "Product Category": "vendorCategory",
+    "Product Number": "Product Number",
+    "Product Name": "description25Char",
+    "Model": "itemNumber",
+    "Unit Rating": "Unit Rating",
+    "Net Wt": "itemWeight",
+    "Pallet Qty": "packQuantity",
+    "Gov-Con Price": "listPrice",
+    "Column1": "imageNameItem"
+    }
+   
