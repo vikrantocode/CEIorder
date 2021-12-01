@@ -1,5 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { Row, Button, Col, Label, Input, Card, CardBody, CustomInput } from 'reactstrap';
+import Loader from 'react-loader-spinner';
+import { Row,
+         Button,
+         Col,
+         Label,
+         Input,
+         Card,
+         CardBody,
+         CustomInput,
+         Modal,
+         ModalBody,
+         ModalFooter,
+         ModalHeader
+         } from 'reactstrap';
 import axios from 'axios';
 import { useHistory } from 'react-router';
 import {
@@ -9,25 +22,28 @@ import {
 import Breadcrumb from '../../../../containers/navs/Breadcrumb';
 import IntlMessages from '../../../../helpers/IntlMessages';
 import { NotificationManager } from '../../../../components/common/react-notifications';
+import { element } from 'prop-types';
+import onClickOutside from 'react-onclickoutside'
 
 
 const BulkOrderOptions = ({ match }) => {
   const [isLoading, setIsLoading] = useState(false);
-  const [orderItems, setOrderItems] = useState([]);
   const [onchange, setOnchange] = useState();
   const [importFile, setImportFile] = useState(null);
   const [formData, setFormData] = useState({});
   const [externalLinkData, setExternalLinkData] = useState({});
+  const [importsModal, setImportsModal] = useState(false);
+  const [fileName, setFileName] = useState('');
 
   const history = useHistory();
 
-
+  const handleClickOutside = () => {
+    console.log('onClickOutside() method called')
+  }
 
   const onValueChange=(e) => {
     setOnchange(e)
-    console.log(e, "---------------------------------------------e")
     history.push('/app/orders/import-bulk-orders');
-    
   }
 
   const ImportFtp = () => {
@@ -35,55 +51,125 @@ const BulkOrderOptions = ({ match }) => {
   }
 
   const ImportExternalLink = () => {
-       console.log(externalLinkData.link, "===========================================External Link")
-       axios.post('/ordersync//import-from-external-link', null, { params: { link: externalLinkData.link } })
-        .then((res) => {
-            console.log(res, "=========================================================res")
-          if (res.status === 201) {
-            NotificationManager.success(
-              res.data.success,
-              'Success',
-              3000,
-              null,
-              null,
-              ''
-            );
-          } else {
-            NotificationManager.error(
-              res.data.error,
-              'Error',
-              3000,
-              null,
-              null,
-              ''
-            );
-          }
-        })
-       
-    //    if (res.status === 201) {
-    //     NotificationManager.success(
-    //       res.data.success,
-    //       'Success',
-    //       3000,
-    //       null,
-    //       null,
-    //       ''
-    //     );
-    //   } else {
-    //     NotificationManager.error(
-    //       res.data.error,
-    //       'Error',
-    //       3000,
-    //       null,
-    //       null,
-    //       ''
-    //     );
-    //   }
-}
-const ImportUploadfile = () =>{
-    console.log(importFile, "============================================================fileData")
+    if (externalLinkData.link && externalLinkData.link.split("/")[0] in ['https:', 'http:']){
+      try{
+        axios.post('/ordersync//import-from-external-link', null, { params: { link: externalLinkData.link } })
+          .then((res) => {
+            if (res.status === 201) {
+              NotificationManager.success(
+                res.data,
+                'Success',
+                3000,
+                null,
+                null,
+                ''
+              );
+            } else {
+              NotificationManager.error(
+                res.data,
+                'Error',
+                3000,
+                null,
+                null,
+                ''
+              );
+            }
+          })
+        }catch{
+          NotificationManager.error(
+            "Somthing went Wrong",
+            'Error',
+            3000,
+            null,
+            null,
+            ''
+          );
+        }
+      }else{
+        NotificationManager.error(
+          `Please Enter a valid link ...`,
+          'Error',
+          3000,
+          null,
+          null,
+          ''
+        );
+      }
 }
 
+const ImportUploadfile = async () => {
+  if (importFile) {
+    for(let i=0;i<importFile.length; i++){
+      setFileName(importFile[i].name);
+      const data = new FormData();
+    data.append('importFile', importFile[i]);
+    
+    const config = {
+        headers: {
+          'content-type': 'multipart/form-data',
+        },
+      };
+      // Details of the uploaded file
+    for (let pair of data.entries()) {
+      console.log(pair[0], ' : ', pair[1], "-------------pair-----------------------");
+    }
+    // Request made to the backend api
+    // Send formData object 
+    try {
+      setImportsModal(true);
+      const res = await axios.post(
+        '/ordersync/import-order-file',
+        data,
+        config
+      );
+      if (res.status === 201) {
+        setImportsModal(false);
+        NotificationManager.success(
+          res.data.success,
+          'Success',
+          3000,
+          null,
+          null,
+          ''
+        );
+      } else {
+        setImportsModal(false);
+        NotificationManager.error(
+          res.data.error,
+          'Error',
+          3000,
+          null,
+          null,
+          ''
+        );
+      }
+      console.log(res);
+    } catch (err) {
+      console.log(err);
+      setImportsModal(false);
+      NotificationManager.error(
+        `Something Wrong With File`,
+        'Error',
+        3000,
+        null,
+        null,
+        ''
+      );
+    }
+    }
+    // Update the formData object
+    
+  } else {
+    NotificationManager.error(
+      `Select File to Import...`,
+      'Error',
+      3000,
+      null,
+      null,
+      ''
+    );
+  }
+};
 
 
   return isLoading ? (
@@ -161,10 +247,10 @@ const ImportUploadfile = () =>{
                       </Label>
                       <CustomInput
                         type="file"
-                        accept=".csv"
+                        accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
                         multiple
                         onChange={(event) => {
-                          setImportFile(event.target.files[0]);
+                          setImportFile(event.target.files);
                         }}
                         id="exampleCustomFileBrowser3"
                         name="customFile"
@@ -174,7 +260,7 @@ const ImportUploadfile = () =>{
                  </Row>
                  <div style={{ padding: '20px 0px', margin: '20px 0px' }}>
                    <Button
-                     color="secondary"
+                     color="primary"
                      onClick={() => {
                         ImportUploadfile();
                      }}
@@ -271,7 +357,7 @@ const ImportUploadfile = () =>{
                   </Row>
                   <div style={{ padding: '20px 0px', margin: '20px 0px' }}>
                     <Button
-                      color="secondary"
+                      color="primary"
                       className="mt-3"
                       onClick={ImportFtp}
                     >
@@ -306,7 +392,7 @@ const ImportUploadfile = () =>{
                   </Row>
                   <div style={{ padding: '20px 0px', margin: '20px 0px' }}>
                     <Button
-                      color="secondary"
+                      color="primary"
                       className="mt-3"
                       onClick = {ImportExternalLink}
                     >
@@ -319,14 +405,26 @@ const ImportUploadfile = () =>{
           </Colxx>
           ):(
           ""
-          )
-        )     
-    )
+           )
+          )     
+        )
         }
-         
-
         </Row>
       </div>
+      
+      <Modal isOpen={importsModal} 
+      toggle={() => setImportsModal(!importsModal)}>
+        <ModalHeader>
+          <h5>{fileName}</h5> <h6>Importing !!!</h6>
+        </ModalHeader>
+        <ModalBody>
+        <div className="col-md-12 text-center">
+         
+          <Loader type="ThreeDots" color="#00BFFF" height={80} width={80} />
+       
+          </div>
+        </ModalBody>
+      </Modal>
     </>
   );
 };

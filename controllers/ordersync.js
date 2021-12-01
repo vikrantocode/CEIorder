@@ -3,17 +3,35 @@ const uploaded = './uploaded';
 const BaseUrl = '../';
 var path = require('path')
 var ps = require('process-sync')
+var csvHeaders = require('csv-headers');
 const csv = require('csvtojson');
 const _ = require('lodash-contrib');
 const xlsx = require('xlsx')
 const fs = require('fs');
 const https = require('https'); // or 'https' for https:// URLs
+const http = require('http'); // or 'https' for https:// URLs
+var csvHeaders = require('csv-headers');
+// Models 
 const sequelize = require('../config/database');
 const Order = require('../models/Order');
 const OrderItem = require('../models/OrderItem');
 const PaymentDetail = require('../models/PaymentDetail');
 const ShippingDetail = require('../models/ShippingDetail');
 const BillingDetail = require('../models/BillingDetail');
+
+const CsvHeader = ["productId", "itemNumber", "description25Char", "businessUnit", "countryOriginCode", "countryOriginName", "greenIndicator", "hazardousMaterialCode",
+ 					"actionIndicator", "activeIndicator", "airShippableIndicator", "assemblyIndicator", "expirationDateIndicator", "facilityTotalOnHandQty", "hubSupplier",
+ 					"keywords", "pinkIndicator", "privateBrandIndicator", "prop65Indicator", "prop65LabelIndicator",	"packQuantity",	"packUnit"	,"prop65ToxicityChemical",
+ 					"prop65WarningMessage","specialFeatBenefitStmt", "recycledIndicator", "serialNumbrRequiredInd", "stockingIndicator", "valuePack", "warrantyComments",
+ 					"warrantyIndicator", "webAvailability", "brandShortName", "subVendorId", "exclusiveBrandCode",	"vendorName", "vendorId", "eBayItemID", "amazonItemID",
+ 					"vendorCategory", "productType", "specialHandlingIndicator", "quickShipIndicator", "itemPackageQty", "dropStock", "salesQtyMin", "description125Character",
+ 					"dualSKUNumber", "dualSKUSequence", "energyStarRatedCode","EPAOrCPGCode", "itemNumberRevised", "itemNumberSubstitute", "itemReferenceCode", "itemQtyPreAuthCode",
+ 					"consolidatedItemCopy", "contentQualityClass", "discontinuedToBeDisco", "discontinuedDate", "discontinuedSource", "MSDSCode", "nonReturnabeCode", 
+ 					"recycleCtntPrcntgPreCons", "recycleCtntPrcntgPostCons", "recycleCtntPrcntgTotal", "shippingClassCode", "SKUGroupId", "SKUGroupName", "SKUGroupVideoUrl", 
+ 					"stateRestrictionCode", "stockStatusCode", "stockingIndicatorDescr", "TAAOrGSACode", "ULCode", "unitConversionFactor", "unitConversionQty", "unitOfMeasureQty",
+ 					"unitWithinUOM", "UNSPSC", "stockStatusALBANALB16", "onHandQtyALBANALB16",	"stockStatusATLANATL01", "onHandQtyATLANATL01",	"stockStatusATLANAGA40", "onHandQtyATLANAGA40",
+ 					"dptCode",	"editDivisor", "marketingSource", "isRebate", "rebateEndDate", "rebateAmount", "handlingCharge", "fobOrigin", "truckParcel", "freightClass",
+ 					"fixedFreightPrice", "freightCommodityCode", "listPrice" ]
 
 var url = require("url");
 var path = require("path");
@@ -30,6 +48,7 @@ const moveFile =function (oldPath, newPath) {
 	}
 	
 }
+
 
 //? Helper Function to Rename Keys
 const renameToDesiredFormat = (data) => {
@@ -133,8 +152,8 @@ const readfile = async (file)=>{
 	if (filext ==='.csv'){
 		const jsonOrders =await csv().fromFile(file);
 		const orders = renameToDesiredFormat(jsonOrders);
-		console.log(orders, "---------------------------csv")
 		return orders;
+		
 	}
 	else if (filext ==='.xlsx'){
 		const wb = xlsx.readFile(file)
@@ -436,152 +455,154 @@ const ImportOrder = async(req, res) => {
 const ImportFromExternalLink = async(req, res) => {
 	const Link = req.query.link
 	var parsed = url.parse(Link);
-	const fileName  = path.basename(parsed.pathname)
-	const file = fs.createWriteStream(fileName);
-	if (path.parse(fileName).ext in ['.csv', '.xlsx', '.XLSX']){
-		const request = https.get(Link, function(response) {
-			response.pipe(file);
-			fs.rename("./"+fileName, uploads+"/"+fileName,function (err) {
-				if (err) {
-					console.log(err, "----------error")
-				}
-			})
-			const filePath = uploads+"/"+fileName
-			const newPath = uploaded+"/"+fileName
-			//  Upload Order 
-			readfile(filePath).then(async(order) =>{
-				const t =await sequelize.transaction();
-				try {
-					for (data of order) {
-						const orderDetails = _.pick(data, [
-							'customerId',
-							'orderSource',
-							'orderSourceOrderId',
-							'isRushOrder',
-							'packageType',
-							'deliveryDate',
-							'locationNotes',
-							'eBaySalesRecordNumber',
-							'serialNumber',
-							'trackingNumber',
-							'disputeStartedOn',
-							'isInDispute',
-							'siteCode',
-							'googleOrderNumber',
-							'customerServiceStatus',
-							'invoicePrinted',
-							'invoicePrintedDate',
-							'status',
-							'timeOfOrder'
-						]);
-						const paymentDetails = _.pick(data, [
-							'paymentStatus',
-							'payementDate',
-							'paymentReferenceNumber',
-							'paymentMethod',
-							'orderCurrency',
-							'orderDiscountsTotal',
-							'insuranceTotal',
-							'subTotal',
-							'grandTotal',
-							'taxRate',
-							'taxTotal',
-							'lineTotal',
-							'finalValueTotal',
-							'postingFeeTotal',
-							'payPalFeeTotal',
-							'orderSourceTotal',
-							'orderId'
-						]);
-						const shippingDetails = _.pick(data, [
-							'shippingTotal',
-							'shippingDiscountsTotal',
-							'dropShipFeeTotal',
-							'shippingDate',
-							'shipFirstName',
-							'shippingLastName',
-							'shipCompanyName',
-							'shipAddress1',
-							'shipAddress2',
-							'shipCity',
-							'shipState',
-							'shipZipCode',
-							'shipCountry',
-							'shipPhoneNumber',
-							'shippingMethodSelected',
-							'companyId',
-							'shippingCarrier',
-							'shippedBy',
-							'shipFromWarehouse',
-							'shippingFee',
-							'originalShippingCost',
-							'adjustedShippingCost',
-							'shippingWeightTotalOz',
-							'shippingStatus',
-							'stationId',
-							'orderId'
-						]);
-						const billingDetails = _.pick(data, [
-							'billingTotal',
-							'billingDiscountsTotal',
-							'billingDate',
-							'billingFirstName',
-							'billingLastName',
-							'billingCompanyName',
-							'billingAddress1',
-							'billingAddress2',
-							'billingCity',
-							'billingState',
-							'billingZipCode',
-							'billingCountry',
-							'billingPhoneNumber',
-							'billingMethodSelected'
-						]);
-						const orderItemDetails = _.pick(data, [
-							'adjustedUnitPrice',
-							'originalUnitPrice',
-							'handlingFee',
-							'giftWrapCharge',
-							'qty',
-							'backOrderQty',
-							'orderId'
-						]);
-						const { id } = await Order.create(orderDetails, { transaction: t });
-						paymentDetails.orderId = id
-						shippingDetails.orderId = id
-						billingDetails.orderId = id
-						orderItemDetails.orderId = id
-						await PaymentDetail.create(paymentDetails, { transaction: t });
-						await BillingDetail.create(billingDetails, { transaction: t });
-						await ShippingDetail.create(shippingDetails, { transaction: t });
-						await ShippingDetail.create(shippingDetails, { transaction: t });
-						await OrderItem.create(orderItemDetails, { transaction: t });
-						console.log(id)
-						}	// End for 
-		
-					t.commit();
-					// // //  Move file to uploded folder after successfully imported 
-					fs.rename(filePath, newPath,function (err) {
-						if (err) {
-							console.log(err, "----------error")
-						}
-					})
-					return res.status(201).send('Order Imported Successfully');
-				} catch (err) {
-						console.log(err, "------------------------------------------------------err")
-						t.rollback();
-						return res.status(500).send('Something Went Wrong');
-				}	
-		
-			})
-		});
-		
-	}else{
-		return res.status(300).send('Invalif file .');
-	}
+	if (parsed.protocol in ['https:', 'http:']){
+		const fileName  = path.basename(parsed.pathname)
+		if (path.parse(fileName).ext in ['.csv', '.xlsx', '.XLSX']){
+			const file = fs.createWriteStream(fileName);
+			const request = https.get(Link, function(response) {
+				response.pipe(file);
+				fs.rename("./"+fileName, uploads+"/"+fileName,function (err) {
+					if (err) {
+						console.log(err, "----------error")
+					}
+				})
+				const filePath = uploads+"/"+fileName
+				const newPath = uploaded+"/"+fileName
+				//  Upload Order 
+				readfile(filePath).then(async(order) =>{
+					const t =await sequelize.transaction();
+					try {
+						for (data of order) {
+							const orderDetails = _.pick(data, [
+								'customerId',
+								'orderSource',
+								'orderSourceOrderId',
+								'isRushOrder',
+								'packageType',
+								'deliveryDate',
+								'locationNotes',
+								'eBaySalesRecordNumber',
+								'serialNumber',
+								'trackingNumber',
+								'disputeStartedOn',
+								'isInDispute',
+								'siteCode',
+								'googleOrderNumber',
+								'customerServiceStatus',
+								'invoicePrinted',
+								'invoicePrintedDate',
+								'status',
+								'timeOfOrder'
+							]);
+							const paymentDetails = _.pick(data, [
+								'paymentStatus',
+								'payementDate',
+								'paymentReferenceNumber',
+								'paymentMethod',
+								'orderCurrency',
+								'orderDiscountsTotal',
+								'insuranceTotal',
+								'subTotal',
+								'grandTotal',
+								'taxRate',
+								'taxTotal',
+								'lineTotal',
+								'finalValueTotal',
+								'postingFeeTotal',
+								'payPalFeeTotal',
+								'orderSourceTotal',
+								'orderId'
+							]);
+							const shippingDetails = _.pick(data, [
+								'shippingTotal',
+								'shippingDiscountsTotal',
+								'dropShipFeeTotal',
+								'shippingDate',
+								'shipFirstName',
+								'shippingLastName',
+								'shipCompanyName',
+								'shipAddress1',
+								'shipAddress2',
+								'shipCity',
+								'shipState',
+								'shipZipCode',
+								'shipCountry',
+								'shipPhoneNumber',
+								'shippingMethodSelected',
+								'companyId',
+								'shippingCarrier',
+								'shippedBy',
+								'shipFromWarehouse',
+								'shippingFee',
+								'originalShippingCost',
+								'adjustedShippingCost',
+								'shippingWeightTotalOz',
+								'shippingStatus',
+								'stationId',
+								'orderId'
+							]);
+							const billingDetails = _.pick(data, [
+								'billingTotal',
+								'billingDiscountsTotal',
+								'billingDate',
+								'billingFirstName',
+								'billingLastName',
+								'billingCompanyName',
+								'billingAddress1',
+								'billingAddress2',
+								'billingCity',
+								'billingState',
+								'billingZipCode',
+								'billingCountry',
+								'billingPhoneNumber',
+								'billingMethodSelected'
+							]);
+							const orderItemDetails = _.pick(data, [
+								'adjustedUnitPrice',
+								'originalUnitPrice',
+								'handlingFee',
+								'giftWrapCharge',
+								'qty',
+								'backOrderQty',
+								'orderId'
+							]);
+							const { id } = await Order.create(orderDetails, { transaction: t });
+							paymentDetails.orderId = id
+							shippingDetails.orderId = id
+							billingDetails.orderId = id
+							orderItemDetails.orderId = id
+							await PaymentDetail.create(paymentDetails, { transaction: t });
+							await BillingDetail.create(billingDetails, { transaction: t });
+							await ShippingDetail.create(shippingDetails, { transaction: t });
+							await ShippingDetail.create(shippingDetails, { transaction: t });
+							await OrderItem.create(orderItemDetails, { transaction: t });
+							console.log(id)
+							}	// End for 
 
-	
-	
+						t.commit();
+						// // //  Move file to uploded folder after successfully imported 
+						fs.rename(filePath, newPath,function (err) {
+							if (err) {
+								console.log(err, "----------error")
+							}
+						})
+						return res.status(201).send('Order Imported Successfully');
+					} catch (err) {
+							console.log(err, "------------------------------------------------------err")
+							t.rollback();
+							return res.status(500).send('Something Went Wrong');
+					}	
+
+				})
+			});
+
+		}else{
+			
+			return res.status(200).send('Invalid file Data .');
+		}
+	}else{
+		return res.status(200).send('Protocol must be https:');
+	}
 	
 }
 
@@ -610,13 +631,149 @@ const SaveFile = async(req,res)=>{
 
     return res.status(201).send('Add Successfully.')
 }
+const ImportOrderfile = async(req, res)=>{
+	try {
 
+		const filePath = (uploads+"/"+req.file.originalname)
+		const rawPath = (uploads+"/"+req.file.filename)
+		const newPath = (uploaded+"/"+req.file.originalname)
+    	fs.rename(rawPath, filePath,function (err) {
+    	    if (err) {
+    	        console.log(err, "----------error")
+    	    }
+    	})
+		readfile(filePath).then(async(order) =>{
+			const t =await sequelize.transaction();
+
+				for (data of order) {
+					const orderDetails = _.pick(data, [
+						'customerId',
+						'orderSource',
+						'orderSourceOrderId',
+						'isRushOrder',
+						'packageType',
+						'deliveryDate',
+						'locationNotes',
+						'eBaySalesRecordNumber',
+						'serialNumber',
+						'trackingNumber',
+						'disputeStartedOn',
+						'isInDispute',
+						'siteCode',
+						'googleOrderNumber',
+						'customerServiceStatus',
+						'invoicePrinted',
+						'invoicePrintedDate',
+						'status',
+						'timeOfOrder'
+					]);
+					const paymentDetails = _.pick(data, [
+						'paymentStatus',
+						'payementDate',
+						'paymentReferenceNumber',
+						'paymentMethod',
+						'orderCurrency',
+						'orderDiscountsTotal',
+						'insuranceTotal',
+						'subTotal',
+						'grandTotal',
+						'taxRate',
+						'taxTotal',
+						'lineTotal',
+						'finalValueTotal',
+						'postingFeeTotal',
+						'payPalFeeTotal',
+						'orderSourceTotal',
+						'orderId'
+					]);
+					const shippingDetails = _.pick(data, [
+						'shippingTotal',
+						'shippingDiscountsTotal',
+						'dropShipFeeTotal',
+						'shippingDate',
+						'shipFirstName',
+						'shippingLastName',
+						'shipCompanyName',
+						'shipAddress1',
+						'shipAddress2',
+						'shipCity',
+						'shipState',
+						'shipZipCode',
+						'shipCountry',
+						'shipPhoneNumber',
+						'shippingMethodSelected',
+						'companyId',
+						'shippingCarrier',
+						'shippedBy',
+						'shipFromWarehouse',
+						'shippingFee',
+						'originalShippingCost',
+						'adjustedShippingCost',
+						'shippingWeightTotalOz',
+						'shippingStatus',
+						'stationId',
+						'orderId'
+					]);
+					const billingDetails = _.pick(data, [
+						'billingTotal',
+						'billingDiscountsTotal',
+						'billingDate',
+						'billingFirstName',
+						'billingLastName',
+						'billingCompanyName',
+						'billingAddress1',
+						'billingAddress2',
+						'billingCity',
+						'billingState',
+						'billingZipCode',
+						'billingCountry',
+						'billingPhoneNumber',
+						'billingMethodSelected'
+					]);
+					const orderItemDetails = _.pick(data, [
+						'adjustedUnitPrice',
+						'originalUnitPrice',
+						'handlingFee',
+						'giftWrapCharge',
+						'qty',
+						'backOrderQty',
+						'orderId'
+					]);
+					const { id } = await Order.create(orderDetails, { transaction: t });
+					paymentDetails.orderId = id
+					shippingDetails.orderId = id
+					billingDetails.orderId = id
+					orderItemDetails.orderId = id
+					await PaymentDetail.create(paymentDetails, { transaction: t });
+					await BillingDetail.create(billingDetails, { transaction: t });
+					await ShippingDetail.create(shippingDetails, { transaction: t });
+					await ShippingDetail.create(shippingDetails, { transaction: t });
+					await OrderItem.create(orderItemDetails, { transaction: t });
+					console.log(id)
+					}	// End for 
+
+				// t.commit();
+				// //  Move file to uploded folder after successfully imported
+				fs.rename(filePath, newPath,function (err) {
+					if (err) {
+						console.log(err, "----------error")
+					}
+				}) 
+					
+				return res.status(201).send('Order Imported Successfully');
+			})
+		}	catch (err) {
+			console.log(err, "------------------------------------------------------err")
+			// t.rollback();
+			return res.status(500).send('Something Went Wrong');
+		}		
+}
 module.exports = {
     Ordersync : Ordersync,
     OrderFileList: OrderFileList,
     DeleteFile:DeleteFile,
     SaveFile:SaveFile,
 	ImportOrder:ImportOrder,
-	ImportFromExternalLink:ImportFromExternalLink
+	ImportFromExternalLink:ImportFromExternalLink,
+	ImportOrderfile:ImportOrderfile
 }
-
