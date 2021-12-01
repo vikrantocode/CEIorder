@@ -19,7 +19,7 @@ const PaymentDetail = require('../models/PaymentDetail');
 const ShippingDetail = require('../models/ShippingDetail');
 const BillingDetail = require('../models/BillingDetail');
 
-const CsvHeader = ["productId", "itemNumber", "description25Char", "businessUnit", "countryOriginCode", "countryOriginName", "greenIndicator", "hazardousMaterialCode",
+const csvHeader = ["productId", "itemNumber", "description25Char", "businessUnit", "countryOriginCode", "countryOriginName", "greenIndicator", "hazardousMaterialCode",
  					"actionIndicator", "activeIndicator", "airShippableIndicator", "assemblyIndicator", "expirationDateIndicator", "facilityTotalOnHandQty", "hubSupplier",
  					"keywords", "pinkIndicator", "privateBrandIndicator", "prop65Indicator", "prop65LabelIndicator",	"packQuantity",	"packUnit"	,"prop65ToxicityChemical",
  					"prop65WarningMessage","specialFeatBenefitStmt", "recycledIndicator", "serialNumbrRequiredInd", "stockingIndicator", "valuePack", "warrantyComments",

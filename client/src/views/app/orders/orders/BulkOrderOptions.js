@@ -22,8 +22,6 @@ import {
 import Breadcrumb from '../../../../containers/navs/Breadcrumb';
 import IntlMessages from '../../../../helpers/IntlMessages';
 import { NotificationManager } from '../../../../components/common/react-notifications';
-import { element } from 'prop-types';
-import onClickOutside from 'react-onclickoutside'
 
 
 const BulkOrderOptions = ({ match }) => {
@@ -49,7 +47,7 @@ const BulkOrderOptions = ({ match }) => {
   const ImportFtp = () => {
       console.log(formData, "-----------------------------form Data")
   }
-
+  
   const ImportExternalLink = () => {
     if (externalLinkData.link && externalLinkData.link.split("/")[0] in ['https:', 'http:']){
       try{
@@ -413,6 +411,7 @@ const ImportUploadfile = async () => {
       </div>
       
       <Modal isOpen={importsModal} 
+      backdrop="static"
       toggle={() => setImportsModal(!importsModal)}>
         <ModalHeader>
           <h5>{fileName}</h5> <h6>Importing !!!</h6>
