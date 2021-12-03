@@ -14,5 +14,6 @@ router.post("/import",upload.single("importFile"), order.SaveFile);
 router.post("/import-order", order.ImportOrder);
 router.post("/import-from-external-link",order.ImportFromExternalLink);
 router.post("/import-order-file",upload.single("importFile"), order.ImportOrderfile );
+router.post("/import-from-ftp", order.ImportFromFTP)
 
 module.exports = router;

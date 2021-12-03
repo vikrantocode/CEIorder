@@ -24,6 +24,7 @@ import IntlMessages from '../../../../helpers/IntlMessages';
 import { NotificationManager } from '../../../../components/common/react-notifications';
 
 
+
 const BulkOrderOptions = ({ match }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [onchange, setOnchange] = useState();
@@ -31,13 +32,11 @@ const BulkOrderOptions = ({ match }) => {
   const [formData, setFormData] = useState({});
   const [externalLinkData, setExternalLinkData] = useState({});
   const [importsModal, setImportsModal] = useState(false);
+  const [ftpModal, setFTPModal] = useState(false);
   const [fileName, setFileName] = useState('');
 
-  const history = useHistory();
 
-  const handleClickOutside = () => {
-    console.log('onClickOutside() method called')
-  }
+  const history = useHistory();
 
   const onValueChange=(e) => {
     setOnchange(e)
@@ -45,13 +44,74 @@ const BulkOrderOptions = ({ match }) => {
   }
 
   const ImportFtp = () => {
-      console.log(formData, "-----------------------------form Data")
+      try{
+        setFTPModal(true);
+        // stablish connection
+        axios.post('/ordersync/import-from-ftp', formData)
+          .then((res) => {
+            if (res.status === 201) {
+              console.log(res.data, "-------------------------------------------------------------")
+              for(let i=0;i<res.data.length; i++){
+                console.log(res.data[i], "-------------------------------------------------------------")
+                setFileName(res.data[i])
+                setImportsModal(true);
+                setFTPModal(false);
+                // import file into database 
+                axios.post('/ordersync/import-order', null, { params: { name: `${res.data[i]}` } })
+                .then((res) => {
+                  if (res.status === 201) {
+                    setImportsModal(false)
+                    NotificationManager.success(
+                      res.data,
+                      'Success',
+                      3000,
+                      null,
+                      null,
+                      ''
+                    );
+                  } else {
+                    setImportsModal(false)
+                    NotificationManager.error(
+                      res.data,
+                      'Error',
+                      3000,
+                      null,
+                      null,
+                      ''
+                    );
+                  }
+                })
+              }
+            } else {
+              setFTPModal(false);
+              NotificationManager.error(
+                res.data,
+                'Error',
+                3000,
+                null,
+                null,
+                ''
+              );
+            }
+          })
+        }catch{
+          setFTPModal(false);
+          NotificationManager.error(
+            "Somthing went Wrong",
+            'Error',
+            3000,
+            null,
+            null,
+            ''
+          );
+        }
+              
   }
-  
+
   const ImportExternalLink = () => {
     if (externalLinkData.link && externalLinkData.link.split("/")[0] in ['https:', 'http:']){
       try{
-        axios.post('/ordersync//import-from-external-link', null, { params: { link: externalLinkData.link } })
+        axios.post('/ordersync/import-from-external-link', null, { params: { link: externalLinkData.link } })
           .then((res) => {
             if (res.status === 201) {
               NotificationManager.success(
@@ -423,6 +483,23 @@ const ImportUploadfile = async () => {
        
           </div>
         </ModalBody>
+      </Modal>
+      <Modal isOpen={ftpModal} 
+      backdrop="static"
+      toggle={() => setFTPModal(!ftpModal)}>
+        <ModalHeader>
+
+          <h3>Please Wait!!! Trying to Stablish Connection</h3>
+
+        </ModalHeader>
+        <ModalBody>
+        <div className="col-md-12 text-center">
+
+          <Loader type="TailSpin" color="#00BFFF" height={80} width={80} /> 
+        
+        </div>
+        </ModalBody>
+                
       </Modal>
     </>
   );

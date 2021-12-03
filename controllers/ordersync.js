@@ -161,6 +161,9 @@ const readfile = async (file)=>{
 		const datas = xlsx.utils.sheet_to_json(ws)
 		console.log(datas, "---------------------------xlsx")
 		return datas;
+	
+	}else{
+		return null
 	}
 
 }
@@ -327,137 +330,150 @@ const Ordersync = async(req, res) => {
 
 
 const ImportOrder = async(req, res) => {
-	const oldPath = req.query.name
+	const oldPath = uploads+'/'+req.query.name
+	console.log(oldPath, "-----------------------oldPath")
 	readfile(oldPath).then(async(order) =>{
-		const t =await sequelize.transaction();
-		try {
-			for (data of order) {
-				const orderDetails = _.pick(data, [
-					'customerId',
-					'orderSource',
-					'orderSourceOrderId',
-					'isRushOrder',
-					'packageType',
-					'deliveryDate',
-					'locationNotes',
-					'eBaySalesRecordNumber',
-					'serialNumber',
-					'trackingNumber',
-					'disputeStartedOn',
-					'isInDispute',
-					'siteCode',
-					'googleOrderNumber',
-					'customerServiceStatus',
-					'invoicePrinted',
-					'invoicePrintedDate',
-					'status',
-					'timeOfOrder'
-				]);
-				const paymentDetails = _.pick(data, [
-					'paymentStatus',
-					'payementDate',
-					'paymentReferenceNumber',
-					'paymentMethod',
-					'orderCurrency',
-					'orderDiscountsTotal',
-					'insuranceTotal',
-					'subTotal',
-					'grandTotal',
-					'taxRate',
-					'taxTotal',
-					'lineTotal',
-					'finalValueTotal',
-					'postingFeeTotal',
-					'payPalFeeTotal',
-					'orderSourceTotal',
-					'orderId'
-				]);
-				const shippingDetails = _.pick(data, [
-					'shippingTotal',
-					'shippingDiscountsTotal',
-					'dropShipFeeTotal',
-					'shippingDate',
-					'shipFirstName',
-					'shippingLastName',
-					'shipCompanyName',
-					'shipAddress1',
-					'shipAddress2',
-					'shipCity',
-					'shipState',
-					'shipZipCode',
-					'shipCountry',
-					'shipPhoneNumber',
-					'shippingMethodSelected',
-					'companyId',
-					'shippingCarrier',
-					'shippedBy',
-					'shipFromWarehouse',
-					'shippingFee',
-					'originalShippingCost',
-					'adjustedShippingCost',
-					'shippingWeightTotalOz',
-					'shippingStatus',
-					'stationId',
-					'orderId'
-				]);
-				const billingDetails = _.pick(data, [
-					'billingTotal',
-					'billingDiscountsTotal',
-					'billingDate',
-					'billingFirstName',
-					'billingLastName',
-					'billingCompanyName',
-					'billingAddress1',
-					'billingAddress2',
-					'billingCity',
-					'billingState',
-					'billingZipCode',
-					'billingCountry',
-					'billingPhoneNumber',
-					'billingMethodSelected'
-				]);
-				const orderItemDetails = _.pick(data, [
-					'adjustedUnitPrice',
-					'originalUnitPrice',
-					'handlingFee',
-					'giftWrapCharge',
-					'qty',
-					'backOrderQty',
-					'orderId'
-				]);
-				const { id } = await Order.create(orderDetails, { transaction: t });
-				paymentDetails.orderId = id
-				shippingDetails.orderId = id
-				billingDetails.orderId = id
-				orderItemDetails.orderId = id
-				await PaymentDetail.create(paymentDetails, { transaction: t });
-				await BillingDetail.create(billingDetails, { transaction: t });
-				await ShippingDetail.create(shippingDetails, { transaction: t });
-				await ShippingDetail.create(shippingDetails, { transaction: t });
-				await OrderItem.create(orderItemDetails, { transaction: t });
-				console.log(id)
-				}	// End for 
+		console.log(order, "----------------------------------order")
+		if (order){
+			const t =await sequelize.transaction();
+			try {
+				for (data of order) {
+					const orderDetails = _.pick(data, [
+						'customerId',
+						'orderSource',
+						'orderSourceOrderId',
+						'isRushOrder',
+						'packageType',
+						'deliveryDate',
+						'locationNotes',
+						'eBaySalesRecordNumber',
+						'serialNumber',
+						'trackingNumber',
+						'disputeStartedOn',
+						'isInDispute',
+						'siteCode',
+						'googleOrderNumber',
+						'customerServiceStatus',
+						'invoicePrinted',
+						'invoicePrintedDate',
+						'status',
+						'timeOfOrder'
+					]);
+					const paymentDetails = _.pick(data, [
+						'paymentStatus',
+						'payementDate',
+						'paymentReferenceNumber',
+						'paymentMethod',
+						'orderCurrency',
+						'orderDiscountsTotal',
+						'insuranceTotal',
+						'subTotal',
+						'grandTotal',
+						'taxRate',
+						'taxTotal',
+						'lineTotal',
+						'finalValueTotal',
+						'postingFeeTotal',
+						'payPalFeeTotal',
+						'orderSourceTotal',
+						'orderId'
+					]);
+					const shippingDetails = _.pick(data, [
+						'shippingTotal',
+						'shippingDiscountsTotal',
+						'dropShipFeeTotal',
+						'shippingDate',
+						'shipFirstName',
+						'shippingLastName',
+						'shipCompanyName',
+						'shipAddress1',
+						'shipAddress2',
+						'shipCity',
+						'shipState',
+						'shipZipCode',
+						'shipCountry',
+						'shipPhoneNumber',
+						'shippingMethodSelected',
+						'companyId',
+						'shippingCarrier',
+						'shippedBy',
+						'shipFromWarehouse',
+						'shippingFee',
+						'originalShippingCost',
+						'adjustedShippingCost',
+						'shippingWeightTotalOz',
+						'shippingStatus',
+						'stationId',
+						'orderId'
+					]);
+					const billingDetails = _.pick(data, [
+						'billingTotal',
+						'billingDiscountsTotal',
+						'billingDate',
+						'billingFirstName',
+						'billingLastName',
+						'billingCompanyName',
+						'billingAddress1',
+						'billingAddress2',
+						'billingCity',
+						'billingState',
+						'billingZipCode',
+						'billingCountry',
+						'billingPhoneNumber',
+						'billingMethodSelected'
+					]);
+					const orderItemDetails = _.pick(data, [
+						'adjustedUnitPrice',
+						'originalUnitPrice',
+						'handlingFee',
+						'giftWrapCharge',
+						'qty',
+						'backOrderQty',
+						'orderId'
+					]);
+					const { id } = await Order.create(orderDetails, { transaction: t });
+					paymentDetails.orderId = id
+					shippingDetails.orderId = id
+					billingDetails.orderId = id
+					orderItemDetails.orderId = id
+					await PaymentDetail.create(paymentDetails, { transaction: t });
+					await BillingDetail.create(billingDetails, { transaction: t });
+					await ShippingDetail.create(shippingDetails, { transaction: t });
+					await ShippingDetail.create(shippingDetails, { transaction: t });
+					await OrderItem.create(orderItemDetails, { transaction: t });
+					console.log(id)
+					}	// End for 
 
-			// t.commit();
-			// // //  Move file to uploded folder after successfully imported 
-			// moveFile(oldPath, newPath)
-			return res.status(201).send('Order Imported Successfully');
-		} catch (err) {
-				console.log(err, "------------------------------------------------------err")
-				// t.rollback();
-				return res.status(500).send('Something Went Wrong');
-
-		}	
+				// t.commit();
+				// // //  Move file to uploded folder after successfully imported 
+				// moveFile(oldPath, newPath)
+				return res.status(201).send('Order Imported Successfully');
+			} catch (err) {
+					console.log(err, "------------------------------------------------------err")
+					// t.rollback();
+					fs.unlinkSync(oldPath)
+					return res.status(200).send('Something Went Wrong');
+			}	
+		}else{
+			try{
+				fs.unlinkSync(oldPath)
+				return res.status(200).send('Invalid File format or Path');
+			}catch{
+				return res.status(200).send('Invalid File format or Path');
+			}
+		}
+		
 
 	})
 
 }
+
 const ImportFromExternalLink = async(req, res) => {
 	const Link = req.query.link
 	var parsed = url.parse(Link);
 	if (parsed.protocol in ['https:', 'http:']){
 		const fileName  = path.basename(parsed.pathname)
-		if (path.parse(fileName).ext in ['.csv', '.xlsx', '.XLSX']){
+		if (['.csv', '.xlsx', '.XLSX'].includes(path.parse(fileName).ext)){
 			const file = fs.createWriteStream(fileName);
 			const request = https.get(Link, function(response) {
 				response.pipe(file);
@@ -643,7 +659,8 @@ const ImportOrderfile = async(req, res)=>{
     	    }
     	})
 		readfile(filePath).then(async(order) =>{
-			const t =await sequelize.transaction();
+			if (order){
+				const t =await sequelize.transaction();
 
 				for (data of order) {
 					const orderDetails = _.pick(data, [
@@ -759,8 +776,10 @@ const ImportOrderfile = async(req, res)=>{
 						console.log(err, "----------error")
 					}
 				}) 
-					
 				return res.status(201).send('Order Imported Successfully');
+			}else{
+				return res.status(200).send('Invalid File format')
+			}	
 			})
 		}	catch (err) {
 			console.log(err, "------------------------------------------------------err")
@@ -768,6 +787,90 @@ const ImportOrderfile = async(req, res)=>{
 			return res.status(500).send('Something Went Wrong');
 		}		
 }
+
+var Client = require('ssh2-sftp-client');
+var moment = require('moment');
+
+const ImportFromFTP = async(req, res)=>{
+	let filesName = [] 
+	const filepath = req.body.path
+	const  filename = filepath.split("/")[filepath.split("/").length - 1]
+	let filext = path.extname(filename)
+	if (filext){
+		if (['.csv', '.xlsx', '.XLSX'].includes(filext)){
+			let sftp = new Client
+    		sftp.connect({
+    		    host: req.body.host,
+    		    port: req.body.port,
+    		    username: req.body.uname,
+    		    password: req.body.password
+    		}).then(() => {
+				console.log("connected=====================================")
+    		    let remoteFilePath = filepath;
+    		    sftp.get(remoteFilePath).then((stream) => {
+    		        let file = uploads+ '/' +filename;
+    		        fs.writeFile(file, stream, (err) => {
+    		            if (err) console.log(err);
+    		        });
+    		        sftp.end();
+					console.log("Connection closed-----------------------------------")
+					return res.status(201).send([filename])
+
+    		    });
+    		}).catch((err) => {
+    		    console.log(err, 'catch error');
+				return res.status(200).send('Something went Wrong .')
+    		});
+
+		}else{
+			return res.status(200).send('Invalid File or File Path ')
+		}
+
+
+	}else{	
+		let remoteFilePath = ""
+		if(filepath.slice(filepath.length - 1)=="/")
+			remoteFilePath = filepath
+		else
+		remoteFilePath = filepath+"/"
+		let sftp = new Client
+    	sftp.connect({
+			host: '147.182.188.252',
+			port: 22,
+			username: 'root',
+			password: 'E@ia0#FP#222M&j#oc'
+    	}).then(() => {
+			return sftp.list(remoteFilePath);
+			}).then((data) => {
+				for(var i = 0; i < data.length; i++) {
+					if (['.csv', '.xlsx', '.XLSX'].includes(path.extname(data[i].name))){
+						const remoteFilename = remoteFilePath + data[i].name;
+						const localFilename = uploads+'/' + data[i].name;
+					
+						sftp.get(remoteFilename).then((stream) => {
+								fs.writeFile(localFilename, stream, (err) => {
+									if (err) console.log(err);
+									
+								});
+								filesName.push(data[i].name)
+							})
+							
+					}
+				}
+    	        // sftp.end();
+				return res.status(201).send(filesName)
+
+    	    // });
+    	}).catch((err) => {
+    	    console.log(err, 'catch error');
+			return res.status(200).send('Something went Wrong .')
+    	});
+	}	
+	
+}
+
+
+
 module.exports = {
     Ordersync : Ordersync,
     OrderFileList: OrderFileList,
@@ -775,5 +878,6 @@ module.exports = {
     SaveFile:SaveFile,
 	ImportOrder:ImportOrder,
 	ImportFromExternalLink:ImportFromExternalLink,
-	ImportOrderfile:ImportOrderfile
+	ImportOrderfile:ImportOrderfile,
+	ImportFromFTP:ImportFromFTP
 }
